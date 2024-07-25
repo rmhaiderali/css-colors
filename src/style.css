@@ -1,0 +1,73 @@
+body {
+  margin: 10px;
+}
+.table-wrapper {
+  overflow: hidden;
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid #a0a0a0;
+}
+.table-scroll {
+  overflow: auto;
+  max-height: calc(100vh - 30px - 2px - 58px);
+}
+@media (min-width: 540px) {
+  .table-scroll {
+    max-height: calc(100vh - 30px - 2px - 24px);
+  }
+}
+table {
+  width: 100%;
+  border-spacing: 0;
+  position: relative;
+}
+th,
+td {
+  padding: 5px 10px;
+  text-wrap: nowrap;
+  text-align: center;
+  border-bottom: 1px solid #a0a0a0;
+}
+th {
+  top: 0;
+  position: sticky;
+  background-color: white;
+}
+tbody tr:last-child * {
+  border-bottom: none;
+}
+.actions-wrapper {
+  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  justify-content: space-between;
+}
+.input-wrapper {
+  gap: 10px;
+  display: flex;
+  min-width: 150px;
+}
+#colorInput {
+  width: 302px;
+  outline: none;
+  padding: 0 2px;
+  min-width: 92px;
+}
+#addButton {
+  width: 40px;
+  height: 24px;
+}
+#schemeButton {
+  width: 150px;
+  height: 24px;
+  text-wrap: nowrap;
+}
+#computedToRGB {
+  outline: none;
+  margin-left: 5px;
+  color-scheme: light;
+}
+#hidden {
+  display: none;
+}
