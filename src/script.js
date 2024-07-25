@@ -1,15 +1,15 @@
-import colorjsio from "https://colorjs.io/dist/color.js";
+import colorjsio from "https://cdn.jsdelivr.net/npm/colorjs.io@0.5.2/+esm";
 import color from "https://cdn.jsdelivr.net/npm/color@4.2.3/+esm";
 import colorparse from "https://cdn.jsdelivr.net/npm/color-parse@2.0.2/+esm";
 
-function fmt(string, ...args) {
-  return string.replace(/{(\d+)}/g, function (match, number) {
-    return typeof args[number] != "undefined" ? args[number] : match;
-  });
+function f(string, ...args) {
+  return string.replace(/{(\d+)}/g, (match, number) =>
+    typeof args[number] != "undefined" ? args[number] : match
+  );
 }
 
 const tbody = document.querySelector("tbody");
-const firstTR = tbody.children[0];
+const firstTr = tbody.children[0];
 
 [
   "InvalidColor",
@@ -61,8 +61,13 @@ function createNewColorRow(color) {
   const tr = document.createElement("tr");
 
   const td1 = document.createElement("td");
-  td1.textContent = color;
   td1.style.backgroundColor = color;
+
+  const span = document.createElement("span");
+  span.textContent = color;
+  span.setAttribute("name", color);
+
+  td1.appendChild(span);
 
   const td2 = document.createElement("td");
   const td3 = document.createElement("td");
@@ -76,76 +81,117 @@ function getRBGA(color) {
   if (computedToRGB.value === "colorjs.io") {
     try {
       const c = new colorjsio(color);
-      return c.srgb.map((v) => v * 255).concat(c.alpha);
+      return c.srgb.map((v) => v * 255).concat(+c.alpha);
     } catch (e) {
       return null;
     }
   }
   //
   else if (computedToRGB.value === "css color-mix") {
-    hidden.style.backgroundColor = fmt(
-      "color-mix(in srgb, transparent 0%, {0})",
-      color
-    );
+    const colorMix = f("color-mix(in srgb, red 0%, {0})", color);
+    setStyle("background-color", colorMix, hidden);
     if (!hidden.style.backgroundColor) return null;
     const computed = window.getComputedStyle(hidden).backgroundColor;
+    removeStyle("background-color", hidden);
     const c = new colorparse(computed);
     return c.values.map((v) => v * 255).concat(c.alpha);
   }
 }
 
+function setStyle(style, value, ...elements) {
+  elements.forEach((el) => (el.style[style] = value));
+}
+
+function removeStyle(style, ...elements) {
+  elements.forEach((el) => el.style.removeProperty(style));
+}
+
+function setTextContent(value, ...elements) {
+  elements.forEach((el) => (el.textContent = value));
+}
+
+function getNestedChild(element, ...indexes) {
+  return indexes.reduce((el, i) => el.children[i], element);
+}
+
+// check if background color changes with color
+// (acts like currentcolor if color is present)
+function doesBGChangesWithColor(el) {
+  el.style.color = "rgb(1, 2, 3)";
+  const bg1 = window.getComputedStyle(el).backgroundColor;
+  el.style.color = "rgb(3, 2, 1)";
+  const bg2 = window.getComputedStyle(el).backgroundColor;
+
+  el.style.removeProperty("color");
+
+  return bg1 === "rgb(1, 2, 3)" && bg2 === "rgb(3, 2, 1)";
+}
+
 function updateText() {
   [...tbody.children].slice(1).forEach((tr) => {
     const [td1, td2, td3] = tr.children;
+    const span = td1.children[0];
 
-    if (!td1.style.backgroundColor) {
-      td2.style.removeProperty("background-color");
-      td3.style.removeProperty("background-color");
-      td2.textContent = "Unsupported Color";
-      td3.textContent = "Unsupported Color";
-      tr.style.color = "black";
-      return;
+    removeStyle("color", span, td2, td3);
+    removeStyle("background-color", td2, td3);
+
+    //
+
+    if (doesBGChangesWithColor(td1)) {
+      span.textContent = span.getAttribute("name") + " ⓘ";
+      span.title = "Acts like currentcolor";
+    } else {
+      span.textContent = span.getAttribute("name");
+      span.removeAttribute("title");
     }
 
-    const computed = window.getComputedStyle(td1).backgroundColor;
+    //
 
-    td2.textContent = td2.style.backgroundColor = computed;
+    let target = span.getAttribute("name");
 
-    const rgba = getRBGA(computed);
-
-    if (!rgba) {
-      td3.style.removeProperty("background-color");
-      td3.textContent = "Unsupported Color";
-      tr.style.color = "black";
-      return;
+    if (td1.style.backgroundColor) {
+      target = window.getComputedStyle(td1).backgroundColor;
+      setTextContent(target, td2);
+      setStyle("background-color", target, td2);
+    } else {
+      setTextContent("Unsupported Color", td2);
     }
+
+    const rgba = getRBGA(target);
+
+    if (!rgba) return setTextContent("Unsupported Color", td3);
 
     const c = color(rgba);
+    const textColor = c.isDark() ? "white" : "black";
+    const rgbaString = c.string();
 
-    td3.textContent = td3.style.backgroundColor = c.string();
+    setTextContent(rgbaString, td3);
+    setStyle("background-color", rgbaString, td3);
 
-    tr.style.color = c.isDark() ? "white" : "black";
+    if (td1.style.backgroundColor) setStyle("color", textColor, span, td2);
+    setStyle("color", textColor, td3);
   });
 }
 
 updateText();
 
 addButton.onclick = function (e) {
-  const color = colorInput.value.trim().toLowerCase();
+  const color = colorInput.value.trim();
 
-  if (!color || color === tbody.children[1].children[0].innerText) return;
+  if (!color || color === getNestedChild(tbody, 1, 0, 0).getAttribute("name"))
+    return null;
 
-  firstTR.insertAdjacentElement("afterend", createNewColorRow(color));
+  firstTr.insertAdjacentElement("afterend", createNewColorRow(color));
   updateText();
 };
 
-colorInput.addEventListener("keydown", function (e) {
+colorInput.onkeydown = function (e) {
   if (e.key === "Enter") addButton.click();
-});
+};
 
 tbody.style.colorScheme = "light";
 
-schemeButton.onclick = function (e) {
+schemeButton.onclick = function () {
   tbody.style.colorScheme =
     tbody.style.colorScheme == "light" ? "dark" : "light";
   schemeButton.innerHTML =
