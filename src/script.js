@@ -10,6 +10,19 @@ function f(string, ...args) {
 
 const tbody = document.querySelector("tbody");
 const firstTr = tbody.children[0];
+const lastTr = tbody.children[1];
+
+const tableScroll = document.querySelector(".table-scroll");
+
+const resizeObserver = new ResizeObserver(() => {
+  const scrollbarV = !!(tableScroll.offsetWidth - tableScroll.clientWidth);
+  const scrollbarH = !!(tableScroll.offsetHeight - tableScroll.clientHeight);
+
+  tableScroll.classList[scrollbarV ? "add" : "remove"]("scrollbar-v");
+  tableScroll.classList[scrollbarH ? "add" : "remove"]("scrollbar-h");
+});
+
+resizeObserver.observe(tableScroll);
 
 [
   "InvalidColor",
@@ -55,7 +68,7 @@ const firstTr = tbody.children[0];
   "WindowText",
 ]
   .map(createNewColorRow)
-  .forEach((tr) => tbody.appendChild(tr));
+  .forEach((tr) => lastTr.insertAdjacentElement("beforebegin", tr));
 
 function createNewColorRow(color) {
   const tr = document.createElement("tr");
@@ -71,8 +84,9 @@ function createNewColorRow(color) {
 
   const td2 = document.createElement("td");
   const td3 = document.createElement("td");
+  const td4 = document.createElement("td");
 
-  tr.append(td1, td2, td3);
+  tr.append(td1, td2, td3, td4);
 
   return tr;
 }
@@ -129,6 +143,8 @@ function doesBGChangesWithColor(el) {
 
 function updateText() {
   [...tbody.children].slice(1).forEach((tr) => {
+    if (tr === lastTr) return null;
+
     const [td1, td2, td3] = tr.children;
     const span = td1.children[0];
 
@@ -175,7 +191,7 @@ function updateText() {
 
 updateText();
 
-addButton.onclick = function (e) {
+addButton.onclick = function () {
   const color = colorInput.value.trim();
 
   if (!color || color === getNestedChild(tbody, 1, 0, 0).getAttribute("name"))

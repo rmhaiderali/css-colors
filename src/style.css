@@ -9,11 +9,11 @@ body {
 }
 .table-scroll {
   overflow: auto;
-  max-height: calc(100vh - 30px - 2px - 58px);
+  max-height: calc(100vh - 30px - 2px - 60px);
 }
 @media (min-width: 540px) {
   .table-scroll {
-    max-height: calc(100vh - 30px - 2px - 24px);
+    max-height: calc(100vh - 30px - 2px - 26px);
   }
 }
 table {
@@ -32,9 +32,6 @@ th {
   top: 0;
   position: sticky;
   background-color: white;
-}
-tbody tr:last-child * {
-  border-bottom: none;
 }
 .actions-wrapper {
   gap: 10px;
@@ -61,7 +58,7 @@ tbody tr:last-child * {
 #schemeButton {
   width: 150px;
   height: 24px;
-  text-wrap: nowrap;
+  white-space: nowrap;
 }
 #computedToRGB {
   outline: none;
@@ -70,4 +67,32 @@ tbody tr:last-child * {
 }
 #hidden {
   display: none;
+}
+
+tbody > tr:nth-last-child(2) > * {
+  border-bottom: 0;
+}
+
+tr > :nth-child(4) {
+  width: 0.01px; /* webkit fix */
+  right: 0;
+  padding: 0;
+  position: sticky;
+  border-bottom: 0;
+}
+
+.scrollbar-v tr > :nth-child(4) {
+  border-left: 1px solid #a0a0a0;
+}
+
+tbody > :last-child > * {
+  height: 0;
+  bottom: 0;
+  padding: 0;
+  position: sticky;
+  border-bottom: 0;
+}
+
+.scrollbar-h tbody > :last-child > * {
+  border-top: 1px solid #a0a0a0;
 }
