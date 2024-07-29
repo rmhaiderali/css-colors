@@ -8,6 +8,12 @@ function f(string, ...args) {
   );
 }
 
+function isDark([r, g, b, a]) {
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  const luminanceWithAlpha = luminance * a + (1 - a);
+  return luminanceWithAlpha < 0.5;
+}
+
 const tbody = document.querySelector("tbody");
 const firstTr = tbody.children[0];
 const lastTr = tbody.children[1];
@@ -163,22 +169,22 @@ function updateText() {
 
     //
 
-    let target = span.getAttribute("name");
+    let colorString = span.getAttribute("name");
 
     if (td1.style.backgroundColor) {
-      target = window.getComputedStyle(td1).backgroundColor;
-      setTextContent(target, td2);
-      setStyle("background-color", target, td2);
+      colorString = window.getComputedStyle(td1).backgroundColor;
+      setTextContent(colorString, td2);
+      setStyle("background-color", colorString, td2);
     } else {
       setTextContent("Unsupported Color", td2);
     }
 
-    const rgba = getRBGA(target);
+    const rgba = getRBGA(colorString);
 
     if (!rgba) return setTextContent("Unsupported Color", td3);
 
     const c = color(rgba);
-    const textColor = c.isDark() ? "white" : "black";
+    const textColor = isDark(rgba) ? "white" : "black";
     const rgbaString = c.string();
 
     setTextContent(rgbaString, td3);
