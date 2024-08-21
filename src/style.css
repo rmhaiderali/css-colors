@@ -69,11 +69,11 @@ th {
   display: none;
 }
 
-tbody > tr:nth-last-child(2) > * {
+tbody > :nth-last-child(2) > * {
   border-bottom: 0;
 }
 
-tr > :nth-child(4) {
+tr > :last-child {
   width: 0.01px; /* webkit fix */
   right: 0;
   padding: 0;
@@ -81,7 +81,7 @@ tr > :nth-child(4) {
   border-bottom: 0;
 }
 
-.scrollbar-v tr > :nth-child(4) {
+.scrollbar-v tr > :last-child {
   border-left: 1px solid #a0a0a0;
 }
 

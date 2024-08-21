@@ -18,6 +18,7 @@ const tbody = document.querySelector("tbody");
 const firstTr = tbody.children[0];
 const lastTr = tbody.children[1];
 
+const colorTrs = [];
 const tableScroll = document.querySelector(".table-scroll");
 
 const resizeObserver = new ResizeObserver(() => {
@@ -74,7 +75,10 @@ resizeObserver.observe(tableScroll);
   "WindowText",
 ]
   .map(createNewColorRow)
-  .forEach((tr) => lastTr.insertAdjacentElement("beforebegin", tr));
+  .forEach((tr) => {
+    lastTr.insertAdjacentElement("beforebegin", tr);
+    colorTrs.push(tr);
+  });
 
 function createNewColorRow(color) {
   const tr = document.createElement("tr");
@@ -148,9 +152,7 @@ function doesBGChangesWithColor(el) {
 }
 
 function updateText() {
-  [...tbody.children].slice(1).forEach((tr) => {
-    if (tr === lastTr) return null;
-
+  colorTrs.forEach((tr) => {
     const [td1, td2, td3] = tr.children;
     const span = td1.children[0];
 
@@ -203,7 +205,9 @@ addButton.onclick = function () {
   if (!color || color === getNestedChild(tbody, 1, 0, 0).getAttribute("name"))
     return null;
 
-  firstTr.insertAdjacentElement("afterend", createNewColorRow(color));
+  const tr = createNewColorRow(color);
+  firstTr.insertAdjacentElement("afterend", tr);
+  colorTrs.unshift(tr);
   updateText();
 };
 
