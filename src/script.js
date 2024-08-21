@@ -1,6 +1,7 @@
 import colorjsio from "https://cdn.jsdelivr.net/npm/colorjs.io@0.5.2/+esm"
 import color from "https://cdn.jsdelivr.net/npm/color@4.2.3/+esm"
 import colorparse from "https://cdn.jsdelivr.net/npm/color-parse@2.0.2/+esm"
+import "https://cdn.jsdelivr.net/npm/computed-style-observer@1.0.0/+esm"
 
 function f(string, ...args) {
   return string.replace(/{(\d+)}/g, (match, number) =>
@@ -234,3 +235,10 @@ window.addEventListener("DOMContentLoaded", () => {
     .matchMedia("(display-mode: standalone)")
     .addEventListener("change", updateText)
 })
+
+const computedStyleObserver = new ComputedStyleObserver(updateText, [
+  "border-top-color",
+  "border-bottom-color",
+])
+
+computedStyleObserver.observe(hidden2)
