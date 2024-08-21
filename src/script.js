@@ -228,3 +228,9 @@ schemeButton.onclick = function () {
 }
 
 computedToRGB.onchange = updateText
+
+window.addEventListener("DOMContentLoaded", () => {
+  window
+    .matchMedia("(display-mode: standalone)")
+    .addEventListener("change", updateText)
+})

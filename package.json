@@ -1,5 +1,18 @@
 {
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.1",
+    "vite-plugin-pwa": "^0.20.1"
+  },
   "prettier": {
     "semi": false
+  },
+  "dependencies": {
+    "vite-plugin-html-inject": "^1.1.2"
   }
 }
