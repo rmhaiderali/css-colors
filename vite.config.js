@@ -3,6 +3,7 @@ import { VitePWA } from "vite-plugin-pwa"
 import injectHTML from "vite-plugin-html-inject"
 
 export default defineConfig({
+  base: "/css-colors/",
   plugins: [
     injectHTML(),
     VitePWA({
